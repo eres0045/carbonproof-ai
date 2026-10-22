@@ -37,7 +37,7 @@ const VERIFICATION_TERMS = [
 
 const SCOPE_TERMS = ['scope 1', 'scope 2', 'scope 3', 'scope-1', 'scope-2', 'scope-3'];
 
-export function analyzeClaim(rawClaim) {
+export function analyzeClaim(rawClaim, ledgerCtx) {
   const claim = (rawClaim || '').trim();
   const lower = claim.toLowerCase();
   const findings = [];
@@ -113,6 +113,28 @@ export function analyzeClaim(rawClaim) {
         'Absolute claims like these are the most commonly challenged form of greenwashing when unsubstantiated.',
     });
     suggestions.push('Replace absolute phrases with the specific, scoped result — or keep the phrase ONLY alongside the evidence above.');
+  }
+
+  // 7) Ledger cross-check: an absolute neutrality claim is tested against
+  // the actual ledger — retired credits vs recorded emissions. This is the
+  // check a spreadsheet-based claim never faces.
+  if (ledgerCtx && /(carbon neutral|net zero|zero emissions|carbon negative|climate positive|zero carbon)/i.test(lower)) {
+    const emittedT = Math.round((ledgerCtx.emittedKg / 1000) * 10) / 10;
+    const retiredT = ledgerCtx.retiredT;
+    if (retiredT * 1000 >= ledgerCtx.emittedKg) {
+      score += 25;
+      findings.push({
+        type: 'good',
+        text: `Ledger cross-check PASSED: retired credits (${retiredT} t) cover recorded emissions (${emittedT} t) in this ledger — the neutrality claim is backed by retirements, not just words.`,
+      });
+    } else {
+      score -= 15;
+      findings.push({
+        type: 'bad',
+        text: `Ledger cross-check FAILED: this ledger records ${emittedT} t of emissions against only ${retiredT} t of retired credits — a shortfall of ${Math.round((emittedT - retiredT) * 10) / 10} t. As recorded here, the neutrality claim is NOT backed.`,
+      });
+      suggestions.push(`Retire at least ${Math.ceil(emittedT - retiredT)} more tonnes of credits against these emissions — or scope the claim to what the retirements actually cover.`);
+    }
   }
 
   score = Math.max(0, Math.min(100, score));
