@@ -1,0 +1,17 @@
+CarbonProof AI — public anchor record
+IEEE ClimateChain Global Hackathon — Carbon Markets & Emissions Transparency track
+
+This file anchors the seeded demonstration ledger of CarbonProof AI.
+The SHA-256 of this file is timestamped on the Bitcoin blockchain via
+OpenTimestamps (proof: anchor.ots). The ledger state it seals:
+
+Ledger head block : #67 (credit_retire, 2026-09-30)
+Ledger head hash  : afd9ffd954baaee59beff0f78900ae95ad80acc1a86bc483a1a64f180a62e9f5
+Blocks            : 68 (65 emissions + 2 credit issuances + 1 credit retirement)
+Emissions total   : 483.40 t CO2e (FY2025-26, GreenMart Retail prototype dataset)
+Credits           : 750 t issued, 300 t retired, 450 t held
+
+Anyone can recompute this head hash from the public source code and the
+seeded dataset, and verify the timestamp of this file against the Bitcoin
+blockchain — the seeded ledger state cannot be quietly rewritten after
+the fact.
