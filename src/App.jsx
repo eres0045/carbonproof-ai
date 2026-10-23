@@ -437,6 +437,26 @@ export default function App() {
           </div>
 
           <div className="panel">
+            <h3>⛓ The same registry, enforced on-chain</h3>
+            <p className="muted">
+              This registry is mirrored by <strong>CarbonRegistry</strong>, a verified Solidity smart contract live on the
+              Ethereum Sepolia testnet. It enforces the identical rules at network level — a serial can be issued only
+              once, and retirements can never exceed issuance — and it anchors this ledger&apos;s seeded head hash
+              on-chain for FY2025-26. The contract is seeded with the same state shown above: 750 t issued, 300 t
+              retired, 450 t held. Read the verified source and every transaction on the explorer:
+            </p>
+            <div className="block-grid">
+              <div><span>Contract (Sepolia)</span><code>0xEeDa0d76…edCF0a8e</code></div>
+              <div><span>On-chain state</span><code>750 t issued · 300 t retired · 450 t held</code></div>
+            </div>
+            <div className="row-actions">
+              <a className="btn" href="https://sepolia.etherscan.io/address/0xEeDa0d764654798Fb25e3981Be236A75edCF0a8e" target="_blank" rel="noreferrer">View the verified contract ↗</a>
+              <a className="btn ghost" href="https://sepolia.etherscan.io/tx/0x03ff6481af01ad3507401f8f2987641b77afb279c1a561d7b474cff9fb4e9c81" target="_blank" rel="noreferrer">See the on-chain anchor tx ↗</a>
+            </div>
+            <p className="muted">Full contract address: <code>0xEeDa0d764654798Fb25e3981Be236A75edCF0a8e</code>. Source and test suite live in the repo under <code>contracts/</code>.</p>
+          </div>
+
+          <div className="panel">
             <h3>Retire credits</h3>
             <p className="muted">Retiring is permanent and sealed into the chain — try retiring more than a serial holds and the registry refuses.</p>
             <form onSubmit={submitRetire} className="form">
@@ -544,7 +564,8 @@ export default function App() {
         CarbonProof AI — IEEE ClimateChain Global Hackathon prototype. Client-side demo: records live in your
         browser&apos;s localStorage and demonstrate tamper-evidence; the seeded state is sealed in a public anchor
         record timestamped via OpenTimestamps (Bitcoin-anchored) so it cannot be quietly rewritten afterwards.
-        A production deployment would anchor every state change and issue credits from a smart contract.
+        The credit registry is also mirrored by a verified smart contract on the Ethereum Sepolia testnet
+        (see the Credits tab); a production deployment would anchor every state change on-chain.
       </footer>
     </div>
   );
