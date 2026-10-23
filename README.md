@@ -60,6 +60,16 @@ single verification pass:
    from this repo and verify the timestamp independently at
    opentimestamps.org — the seeded history cannot be quietly rewritten
    afterwards, not even by us.
+5. **On-chain registry (live).** The credit registry is mirrored by
+   **CarbonRegistry**, a Solidity smart contract deployed on the Ethereum
+   Sepolia testnet with its source verified (exact match) on the explorer:
+   [`0xEeDa0d764654798Fb25e3981Be236A75edCF0a8e`](https://sepolia.etherscan.io/address/0xEeDa0d764654798Fb25e3981Be236A75edCF0a8e).
+   It enforces the same anti-double-counting rules at network level — a
+   serial can be issued only once; retirements can never exceed issuance —
+   is seeded with the same state as the app (750 t issued, 300 t retired,
+   450 t held), and anchors the ledger's FY2025-26 head hash on-chain.
+   13 Hardhat tests cover the guards, including the over-retirement
+   refusal. Source, tests and deployment record: [`contracts/`](contracts/).
 
 ## Track alignment
 
@@ -67,7 +77,8 @@ The track calls for blockchain-based carbon-credit verification,
 transparent emissions tracking, and mechanisms that prevent double
 counting. CarbonProof AI implements exactly that stack in miniature:
 hash-chained tracking, a serial-based credit registry whose verification
-*enforces* the no-double-counting invariant, and a public-chain anchor —
+*enforces* the no-double-counting invariant, a deployed smart contract
+enforcing the same invariant on a public testnet, and a Bitcoin anchor —
 in a form a small organization can actually use today.
 
 ## Features
@@ -82,6 +93,9 @@ in a form a small organization can actually use today.
   guard enforced in both the UI and chain verification.
 - ⛓ **Bitcoin anchoring** — OpenTimestamps proof for the seeded state,
   downloadable from the dashboard and independently verifiable.
+- 📜 **Smart-contract registry** — CarbonRegistry on Ethereum Sepolia
+  (verified source), enforcing unique serials and retire-≤-issued
+  on-chain, seeded to mirror the app and anchoring its head hash.
 - 🔍 **Claim checker** — substantiation score, flagged phrases,
   improvement suggestions, and the ledger cross-check for neutrality
   claims.
@@ -107,6 +121,10 @@ src/
 public/
   carbonproof-anchor.txt    — anchor record sealing the seeded ledger state
   anchor.ots                — OpenTimestamps proof for that record
+contracts/
+  contracts/CarbonRegistry.sol — on-chain registry (Sepolia, verified)
+  test/                     — Hardhat suite for the double-count guards
+  scripts/deploy.js         — deploy + seed + anchor, asserts final totals
 tests/logic.test.mjs        — SHA-256 vectors, chain validity, tamper
                               detection, credit-invariant tests, claim
                               cross-check, CSV import tests
@@ -139,9 +157,10 @@ node tests/logic.test.mjs   # run the logic tests (all passing)
 ## Limitations (honest list)
 
 - **Client-side demo.** Records live in the visitor's browser
-  (localStorage); the anchor seals the *seeded* state, not later edits —
-  a production deployment would anchor every state change and hold the
-  registry in a smart contract.
+  (localStorage); the anchor seals the *seeded* state, not later edits.
+  The registry's smart-contract mirror is a Sepolia **testnet** prototype
+  seeded with the same state — a production deployment would run the
+  registry on mainnet and anchor every state change, not just genesis.
 - **Tamper-evidence ≠ tamper-proofing.** The chain + public anchor make
   edits *detectable against an independent commitment*; they do not make
   edits impossible on a private copy.
@@ -153,8 +172,10 @@ node tests/logic.test.mjs   # run the logic tests (all passing)
 
 ## Roadmap
 
-1. **Smart-contract registry** — move issuance/retirement on-chain so the
-   double-counting guard is enforced by the network, not the app.
+1. **Smart-contract registry — SHIPPED (testnet).** CarbonRegistry is live
+   on Ethereum Sepolia with the double-counting guard enforced by the
+   network; remaining step is a mainnet deployment with per-change
+   anchoring.
 2. **Per-change anchoring** — anchor every ledger state transition
    (Merkle root per period) instead of only genesis state.
 3. **Evidence hashing** — hash bills/meter photos into blocks so evidence
